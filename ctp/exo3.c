@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stdlib.h> 
+#include <stdlib.h>
 
 typedef struct {
     int tulipe;
@@ -7,76 +7,62 @@ typedef struct {
     int pivoine;
 } bouquet_t;
 
-bouquet_t* nouveau_bouquet(void);
-void initialise_bouquet(bouquet_t* bouquet, int nb_roses, int nb_tulipes, int nb_pivoines);
-void affiche_bouquet(bouquet_t* bouquet);
-void libere_bouquet(bouquet_t* bouquet);
-bouquet_t* combine_bouquets(bouquet_t* bouquet_1, bouquet_t* bouquet_2);
+typedef struct {
+    int nb_bouquets;
+    bouquet_t** tableau;
+} commande_t;
 
-int main()
+commande_t* nouvelle_commande(int nb_bouquets);
+void remplir_commande(commande_t* commande); 
+void affiche_commande(commande_t* commande);
+void libere_commande(commande_t* commande);
+int main() 
 {
-    bouquet_t* bouquet = nouveau_bouquet();
-    initialise_bouquet(bouquet, 10,1,0);
-    affiche_bouquet(bouquet);
-    bouquet_t* bouquet2 = nouveau_bouquet();
-    initialise_bouquet(bouquet, 4,3,0);
-    affiche_bouquet(bouquet);
-    bouquet_t* bouquet_final = combine_bouquets(bouquet, bouquet2);
-    affiche_bouquet(bouquet_final);
-    affiche_bouquet(bouquet_final);
-    affiche_bouquet(bouquet_final);
+    commande_t* com = nouvelle_commande(3);
+    remplir_commande(com);
+    affiche_commande(com);
+    libere_commande(com);
+    affiche_commande(com);
     return 0;
 }
 
-bouquet_t* nouveau_bouquet(void)
+commande_t* nouvelle_commande(int nb_bouquets)
 {
-    bouquet_t* bouquet = malloc(sizeof(bouquet));
-    return bouquet;
+    commande_t* commande = malloc(sizeof(commande_t));
+    commande->nb_bouquets = nb_bouquets;
+    commande->tableau = malloc(sizeof(bouquet_t*) * nb_bouquets);
+    for (int cpt = 0; cpt<nb_bouquets; cpt++) {
+        commande->tableau[cpt] = malloc(sizeof(bouquet_t*));
+    }
+    return commande;
 }
 
-void initialise_bouquet(bouquet_t* bouquet, int nb_roses, int nb_tulipes, int nb_pivoines)
+void remplir_commande(commande_t* commande) 
 {
-    bouquet->rose = nb_roses;
-    bouquet->tulipe = nb_tulipes;
-    bouquet->pivoine = nb_pivoines;
-}
-
-void affiche_bouquet(bouquet_t* bouquet)
-{
-    if (bouquet->rose>1) {
-        printf("%d  roses,", bouquet->rose);
-    } else {
-        printf("%d  rose,", bouquet->rose);
-    }
-
-    if (bouquet->tulipe>1) {
-        printf(" %d  tulipes,", bouquet->tulipe);
-    } else {
-        printf(" %d  tulipe,", bouquet->tulipe);
-    }
-
-    if (bouquet->pivoine>1) {
-        printf(" %d  pivoines\n", bouquet->pivoine);
-    } else {
-        printf(" %d  pivoine\n", bouquet->pivoine);
+    for (int cpt = 0 ; cpt<(commande->nb_bouquets) ; cpt++)
+    {
+        commande->tableau[cpt]->pivoine = cpt;
+        commande->tableau[cpt]->tulipe = cpt;
+        commande->tableau[cpt]->rose = cpt;
     }
 }
 
-void libere_bouquet(bouquet_t* bouquet)
+void affiche_commande(commande_t* commande)
 {
-    free(bouquet);
+    printf("La commande contient %d bouquets.\n", commande->nb_bouquets);
+    for (int cpt = 0 ; cpt<(commande->nb_bouquets) ; cpt++)
+    {
+        printf("Bouquet %d : %d rose, %d tulipe et %d pivoine\n",cpt, commande->tableau[cpt]->rose, commande->tableau[cpt]->tulipe, commande->tableau[cpt]->pivoine);
+    }
 }
 
-bouquet_t* combine_bouquets(bouquet_t* bouquet_1, bouquet_t* bouquet_2)
+void libere_commande(commande_t* commande)
 {
-    bouquet_t* bouquet_x = nouveau_bouquet();
-    int total_tulip = (bouquet_1->tulipe + bouquet_2->tulipe);
-    int total_rose = (bouquet_1->rose + bouquet_2->rose);
-    int total_pivoine = (bouquet_1->pivoine + bouquet_2->pivoine);
-    bouquet_x->tulipe = total_tulip;
-    bouquet_x->rose = total_rose;
-    bouquet_x->pivoine = total_pivoine;
-    libere_bouquet(bouquet_1);
-    libere_bouquet(bouquet_2);
-    return bouquet_x;
+    for (int cpt = 0 ; cpt<(commande->nb_bouquets) ; cpt++)
+    {
+        free(commande->tableau[cpt]);
+    }
+    free(commande->tableau);
+    free(commande);
 }
+
